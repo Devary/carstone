@@ -1,0 +1,12 @@
+<div class="shell-sidebar-pin">
+  <sb-sidebar
+    name="main"
+    [activePaths]="activePaths()"
+    [(open)]="sidebarOpen"
+    style="--sb-height: 100%"
+  />
+</div>
+
+<div class="shell-main" [style]="contentStyle()">
+  <router-outlet/>
+</div>

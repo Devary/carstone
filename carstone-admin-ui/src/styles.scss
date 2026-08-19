@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+@use 'primeicons/primeicons.css';
+
+body {
+  margin: 0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html.app-dark body {
+  background: var(--p-surface-950, #09090b);
+  color: var(--p-text-color);
+}
+
+// frosted-glass modals: every PrimeNG dialog type shares the one .p-dialog-mask element, so one
+// rule blurs the page behind all of them — matches the standardized ecosystem look
+.p-dialog-mask {
+  backdrop-filter: blur(6px);
+}
+
+.p-dialog {
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}

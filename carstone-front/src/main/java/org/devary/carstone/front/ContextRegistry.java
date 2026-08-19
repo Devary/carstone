@@ -22,6 +22,11 @@ public class ContextRegistry {
     private final EntityScanner scanner = new EntityScanner();
 
     private final Map<String, TableContext> byEntityName = new LinkedHashMap<>();
+    // see carstone-admin's own ContextRegistry for why this is required, not optional — a
+    // route/sidebar-link path can genuinely differ from the entity's own name (CarListing:
+    // name="carListings", path="listings"), and crudstone's frontend requests by the raw route
+    // segment, never a resolved entity name
+    private final Map<String, TableContext> byPath = new LinkedHashMap<>();
 
     @ConfigProperty(name = "crud.entity-packages")
     List<String> entityPackages;
@@ -33,6 +38,8 @@ public class ContextRegistry {
             TableContext context = annotationLoader.load(entityClass);
             validate(entityClass.getName(), context);
             byEntityName.put(context.getName(), context);
+            String path = context.getPath() == null || context.getPath().isBlank() ? context.getName() : context.getPath();
+            byPath.put(path, context);
         }
     }
 
@@ -54,7 +61,8 @@ public class ContextRegistry {
     }
 
     public Optional<TableContext> byKeyOrEntityName(String name) {
-        return byEntityName(name);
+        Optional<TableContext> byName = byEntityName(name);
+        return byName.isPresent() ? byName : Optional.ofNullable(byPath.get(name));
     }
 
     public Set<String> keys() {

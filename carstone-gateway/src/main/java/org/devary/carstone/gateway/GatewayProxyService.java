@@ -40,7 +40,17 @@ public class GatewayProxyService {
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(8);
 
     private final ServiceRegistry serviceRegistry;
+    // HTTP_1_1 pinned deliberately: the JDK HttpClient defaults to preferring HTTP/2 and
+    // opportunistically negotiating it per-connection — against Quarkus dev-mode's HTTP
+    // endpoint (carstone-admin/carstone-front here), the first request(s) after a fresh boot
+    // reproducibly fail with "java.io.IOException: Received RST_STREAM: Protocol error" before
+    // the client falls back, confirmed live (every real browser page load hit this — two
+    // near-simultaneous requests firing right after a restart — while spaced-out manual curl
+    // calls almost never did, since by then a working connection was already established).
+    // Both backends are plain cleartext HTTP/1.1 services; there's no reason to negotiate HTTP/2
+    // with them at all.
     private final HttpClient httpClient = HttpClient.newBuilder()
+            .version(HttpClient.Version.HTTP_1_1)
             .connectTimeout(CONNECT_TIMEOUT)
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();

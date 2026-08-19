@@ -1,0 +1,11 @@
+<router-outlet/>
+<p-toast/>
+<button
+  type="button"
+  class="dark-toggle"
+  data-cy="dark-toggle"
+  (click)="toggleDark()"
+  [attr.aria-label]="dark() ? 'Switch to light mode' : 'Switch to dark mode'"
+>
+  <i class="pi" [class.pi-moon]="!dark()" [class.pi-sun]="dark()"></i>
+</button>

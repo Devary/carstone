@@ -42,6 +42,7 @@ import java.time.LocalDate;
 @CrudstoneEntity(
         name = "carListings",
         path = "listings",
+        title = "Car Listings",
         disabledFields = {"id", "yearFrom", "yearTo", "priceFrom", "priceTo", "mileageFrom", "mileageTo"},
         allowExportAction = true,
         showGlobalSearchBar = true,
