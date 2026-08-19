@@ -1,0 +1,21 @@
+/* You can add global styles to this file, and also import other style files */
+@use 'primeicons/primeicons.css';
+
+body {
+  margin: 0;
+  font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html.app-dark body {
+  background: var(--p-surface-950, #09090b);
+  color: var(--p-text-color);
+}
+
+.p-dialog-mask {
+  backdrop-filter: blur(6px);
+}
+
+.p-dialog {
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
