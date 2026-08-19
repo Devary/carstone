@@ -135,8 +135,12 @@ public class CarListing extends PanacheEntity {
     private String color;
 
     // denormalized copy of seller.type, set at create/seed time — see class javadoc and
-    // Seller's own javadoc for why this exists alongside the seller relation below
-    @CrudstoneField(type = "enum", enumClass = SellerType.class, notNull = true)
+    // Seller's own javadoc for why this exists alongside the seller relation below. NOT
+    // notNull: the client never submits this directly (CarListingHandler derives it from the
+    // required `seller` relation after the generic wire-body validator would already run), so a
+    // client-side "must be present in the request" constraint would reject every legitimate
+    // create/update before the handler ever gets a chance to fill it in.
+    @CrudstoneField(type = "enum", enumClass = SellerType.class)
     @SearchableField(external = true, order = 9, style = "col-md-2")
     @SearchResult(order = 9)
     private String sellerType;
