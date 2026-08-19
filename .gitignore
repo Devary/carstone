@@ -1,0 +1,14 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+
+node_modules/
+dist/
+.angular/
+*.tgz
+npm-debug.log*
+
+.env
+.DS_Store

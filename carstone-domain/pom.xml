@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.devary</groupId>
+        <artifactId>carstone-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+    <artifactId>carstone-domain</artifactId>
+    <packaging>jar</packaging>
+
+    <!--
+    Plain library module (like context-gen itself, not a Quarkus application) — the shared
+    @Entity + @CrudstoneEntity/@Searchable POJOs (Brand, Seller, CarListing) both carstone-admin
+    (writes) and carstone-front (reads) depend on, so the two never drift on schema/annotation
+    metadata. Needs Hibernate Reactive Panache on the compile classpath since entities extend
+    PanacheEntity, but does NOT run the quarkus-maven-plugin itself (no application here).
+    -->
+    <dependencies>
+        <dependency>
+            <groupId>org.devary</groupId>
+            <artifactId>context-gen</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-reactive-panache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-arc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.27.6</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
