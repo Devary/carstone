@@ -1,0 +1,122 @@
+// glassmorphism: translucent surface + backdrop-filter blur, colors read through PrimeNG's own
+// --p-* design tokens (dark-mode aware automatically) plus --p-primary-* from themeVars() above —
+// never a hardcoded hex value, same convention every sibling library already follows.
+.sf-footer {
+  position: relative;
+  margin-top: 4rem;
+  padding: 3.5rem 2rem 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--p-surface-950, #09090b) 72%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid color-mix(in srgb, var(--p-primary-color, #3b82f6) 25%, transparent);
+  color: var(--p-text-muted-color);
+}
+
+.sf-footer-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(60% 140% at 15% 0%, color-mix(in srgb, var(--p-primary-color, #3b82f6) 18%, transparent), transparent 60%);
+}
+
+.sf-footer-content {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-bottom: 2.5rem;
+}
+
+.sf-footer-brand {
+  flex: 1 1 260px;
+  min-width: 220px;
+}
+
+.sf-footer-logo {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--p-primary-300, #93c5fd), var(--p-primary-color, #3b82f6));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.sf-footer-tagline {
+  margin: 0.5rem 0 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-width: 30ch;
+}
+
+.sf-footer-social {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.sf-footer-social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--p-primary-color, #3b82f6) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--p-primary-color, #3b82f6) 30%, transparent);
+  color: var(--p-text-color);
+  text-decoration: none;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.sf-footer-social-link:hover {
+  background: var(--p-primary-color, #3b82f6);
+  color: var(--p-primary-contrast-color, #fff);
+  transform: translateY(-2px);
+}
+
+.sf-footer-column {
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+
+.sf-footer-column h4 {
+  margin: 0 0 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--p-text-color);
+}
+
+.sf-footer-column ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.sf-footer-column a {
+  color: var(--p-text-muted-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.15s;
+}
+
+.sf-footer-column a:hover {
+  color: var(--p-primary-color, #3b82f6);
+}
+
+.sf-footer-bottom {
+  position: relative;
+  border-top: 1px solid color-mix(in srgb, var(--p-content-border-color, #333) 60%, transparent);
+  padding: 1.25rem 0;
+  text-align: center;
+  font-size: 0.8rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}

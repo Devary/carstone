@@ -7,8 +7,18 @@ body {
 }
 
 html.app-dark body {
-  background: var(--p-surface-950, #09090b);
+  // dark blurry background: a fixed multi-glow gradient (never a flat color) so translucent
+  // glass surfaces above it (the search bar, .glass-card, sf-footer) actually have something to
+  // blur — colors read through PrimeNG's own --p-surface-*/--p-primary-* tokens, same override
+  // system as everything else, not new hardcoded hex values.
+  background-color: var(--p-surface-950, #09090b);
+  background-image:
+    radial-gradient(50% 40% at 15% 10%, color-mix(in srgb, var(--p-primary-color, #3b82f6) 22%, transparent), transparent 70%),
+    radial-gradient(45% 35% at 90% 15%, color-mix(in srgb, var(--p-primary-400, #60a5fa) 14%, transparent), transparent 70%),
+    radial-gradient(60% 50% at 50% 100%, color-mix(in srgb, var(--p-primary-700, #1d4ed8) 18%, transparent), transparent 75%);
+  background-attachment: fixed;
   color: var(--p-text-color);
+  min-height: 100vh;
 }
 
 .p-dialog-mask {
@@ -18,4 +28,37 @@ html.app-dark body {
 .p-dialog {
   border-radius: 16px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+// shared glassmorphism building blocks for standalone pages (Contact, About, ...) — same
+// backdrop-filter-blur + translucent-surface technique sf-footer uses, colors through --p-*
+// tokens only.
+.page-backdrop {
+  min-height: calc(100vh - 4rem);
+  padding: 1rem 1.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.glass-card {
+  width: 100%;
+  padding: 2.5rem;
+  border-radius: 20px;
+  background: color-mix(in srgb, var(--p-content-background, #18181b) 65%, transparent);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid color-mix(in srgb, var(--p-primary-color, #3b82f6) 20%, transparent);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.glass-card h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.page-lede {
+  color: var(--p-text-muted-color);
+  line-height: 1.6;
 }

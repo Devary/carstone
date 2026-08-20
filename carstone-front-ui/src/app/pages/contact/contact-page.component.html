@@ -1,0 +1,32 @@
+<div class="page-backdrop">
+  <div class="glass-card contact-card" data-cy="contact-page">
+    <h1>Get in touch</h1>
+    <p class="page-lede">Questions about a listing, selling your car, or a dealership partnership? Send us a message.</p>
+
+    @if (submitted()) {
+      <div class="contact-success" data-cy="contact-success">
+        <i class="pi pi-check-circle"></i>
+        <span>Thanks — we'll be in touch soon.</span>
+      </div>
+    }
+
+    <!-- deliberately no (ngSubmit)/type="submit": a real native form submission (even with
+         Angular's own preventDefault inside ngSubmit) reloaded the page before the success state
+         ever rendered — type="button" + (onClick) below is the only thing driving submit() now. -->
+    <form class="contact-form" #form="ngForm">
+      <label>
+        <span>Name</span>
+        <input pInputText type="text" name="name" [(ngModel)]="name" required data-cy="contact-name" />
+      </label>
+      <label>
+        <span>Email</span>
+        <input pInputText type="email" name="email" [(ngModel)]="email" required data-cy="contact-email" />
+      </label>
+      <label>
+        <span>Message</span>
+        <textarea pTextarea name="message" rows="5" [(ngModel)]="message" required data-cy="contact-message"></textarea>
+      </label>
+      <p-button type="button" label="Send message" icon="pi pi-send" [disabled]="form.invalid" (onClick)="submit()" data-cy="contact-submit" />
+    </form>
+  </div>
+</div>

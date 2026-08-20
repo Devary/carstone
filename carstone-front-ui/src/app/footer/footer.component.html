@@ -1,0 +1,30 @@
+<footer class="sf-footer" data-cy="site-footer">
+  <div class="sf-footer-glow"></div>
+  <div class="sf-footer-content">
+    <div class="sf-footer-brand">
+      <div class="sf-footer-logo">{{ config().brand }}</div>
+      <p class="sf-footer-tagline">{{ config().tagline }}</p>
+      <div class="sf-footer-social">
+        @for (social of config().socialLinks; track social.label) {
+          <a [href]="social.href" [attr.aria-label]="social.label" class="sf-footer-social-link" target="_blank" rel="noopener">
+            <i class="pi" [class]="social.icon"></i>
+          </a>
+        }
+      </div>
+    </div>
+
+    @for (column of config().columns; track column.title) {
+      <div class="sf-footer-column">
+        <h4>{{ column.title }}</h4>
+        <ul>
+          @for (link of column.links; track link.path) {
+            <li><a [routerLink]="link.path">{{ link.label }}</a></li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+  <div class="sf-footer-bottom">
+    <span>{{ config().copyright }} &copy; {{ year }}</span>
+  </div>
+</footer>

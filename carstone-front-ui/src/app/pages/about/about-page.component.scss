@@ -1,0 +1,29 @@
+.about-card {
+  max-width: 640px;
+  margin: 3rem auto;
+}
+
+.about-stats {
+  display: flex;
+  gap: 2rem;
+  margin: 1.75rem 0;
+  padding: 1.25rem 0;
+  border-top: 1px solid var(--p-content-border-color);
+  border-bottom: 1px solid var(--p-content-border-color);
+}
+
+.about-stats div {
+  display: flex;
+  flex-direction: column;
+}
+
+.about-stats strong {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--p-primary-color);
+}
+
+.about-stats span {
+  font-size: 0.8rem;
+  color: var(--p-text-muted-color);
+}

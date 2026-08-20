@@ -1,5 +1,7 @@
 import {Routes} from '@angular/router';
 import {EntitySearchPageComponent, EntitySearchResultsPageComponent} from 'searchcrudstone';
+import {AboutPageComponent} from './pages/about/about-page.component';
+import {ContactPageComponent} from './pages/contact/contact-page.component';
 
 // CarListing has @Searchable(externalResult = true) — landing on /carListings auto-navigates to
 // /carListings/results once a search runs (EntitySearchComponent's own externalResult handling),
@@ -15,6 +17,10 @@ import {EntitySearchPageComponent, EntitySearchResultsPageComponent} from 'searc
 // that, rather than trying to make search-crudstone preserve an alias it has no concept of.
 export const routes: Routes = [
   {path: '', redirectTo: 'carListings', pathMatch: 'full'},
+  // must come BEFORE the ':entity' catch-all below, or search-crudstone would try (and fail) to
+  // load a search context named "about"/"contact"
+  {path: 'about', component: AboutPageComponent},
+  {path: 'contact', component: ContactPageComponent},
   {path: ':entity/results', component: EntitySearchResultsPageComponent},
   {path: ':entity', component: EntitySearchPageComponent},
 ];

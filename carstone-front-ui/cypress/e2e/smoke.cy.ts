@@ -109,4 +109,32 @@ describe('carstone-front-ui smoke', () => {
     cy.get('.p-datepicker-panel').contains('.p-datepicker-year', String(nextYear)).should('have.class', 'p-disabled');
     cy.screenshot('07-year-no-future-value');
   });
+
+  it('the footer renders on every page with working links to About/Contact', () => {
+    cy.visit('/carListings');
+    cy.get('[data-cy=site-footer]').should('be.visible').and('contain.text', 'Carstone');
+    cy.get('[data-cy=site-footer]').contains('a', 'About us').click();
+    cy.url().should('include', '/about');
+    cy.get('[data-cy=about-page]').should('be.visible');
+    cy.get('[data-cy=site-footer]').should('be.visible');
+
+    cy.get('[data-cy=site-footer]').contains('a', 'Contact us').click();
+    cy.url().should('include', '/contact');
+    cy.get('[data-cy=contact-page]').should('be.visible');
+    cy.screenshot('08-footer-and-pages');
+  });
+
+  it('the contact form submits and shows a confirmation', () => {
+    cy.visit('/contact');
+    cy.get('[data-cy=contact-name]').type('Jane Doe');
+    cy.get('[data-cy=contact-email]').type('jane@example.com');
+    cy.get('[data-cy=contact-message]').type('Interested in the BMW listing.');
+    // the INNER native <button>, not the [data-cy] attribute's own element (the <p-button> host
+    // wrapper) — clicking the wrapper doesn't reliably reach PrimeNG's own (onClick) output
+    // through Cypress, confirmed by dumping the post-click DOM: the wrapper click left
+    // `submitted()` false with no error, while clicking the nested real button worked
+    cy.get('[data-cy=contact-submit] button').click();
+    cy.get('[data-cy=contact-success]').should('be.visible');
+    cy.screenshot('09-contact-submitted');
+  });
 });
