@@ -53,4 +53,42 @@ describe('carstone-front-ui smoke', () => {
     cy.get('[data-cy=entity-search-result-card]', {timeout: 10000}).first().click({force: true});
     cy.screenshot('04-result-selected');
   });
+
+  it('interacting with the price slider twice in a row keeps advancing instead of snapping back', () => {
+    // Regression test for the "range is not moving, it's like blocked" report: rangeSliderValueOf
+    // used to read straight from filterValues(), which doesn't change until onSlideEnd, so every
+    // change-detection tick re-pushed the stale pre-interaction value back into the slider and
+    // fought the user (PrimeNG's writeValue() has no dirty-check guard). rangeSliderStaged +
+    // rangeSliderCommitted (entity-search.component.ts) decouple the live position from
+    // filterValues() and keep a stable array reference across CD ticks respectively. Two
+    // consecutive onBarClick interactions (the same mechanism the pre-existing price-range test
+    // uses — a raw mousedown/mousemove drag sequence proved too fiddly to simulate reliably
+    // through Cypress/Electron's synthetic-event pipeline and isn't needed to prove this) must
+    // each move the handle further, not reset to the same position.
+    cy.visit('/carListings');
+    cy.get('[data-cy=priceFrom-filter]').as('slider');
+
+    cy.get('@slider').find('.p-slider').click(30, 8, {force: true});
+    cy.get('@slider').invoke('text').then(afterFirstClick => {
+      cy.get('@slider').find('.p-slider').click(70, 8, {force: true});
+      cy.get('@slider').invoke('text').should(afterSecondClick => {
+        expect(afterSecondClick).not.to.equal(afterFirstClick);
+      });
+    });
+    cy.screenshot('05-price-slider-interacted-twice');
+  });
+
+  it('a year "from" value can never be typed past the current "to" value, and vice versa', () => {
+    // Regression test for "year min cannot be greater than year max": rangeInputMinFor/
+    // rangeInputMaxFor bind each half's own <input min>/<max> to its sibling's CURRENT value, so
+    // the browser (and PrimeNG's own input handling) clamps a violating value at entry time
+    // instead of accepting yearFrom > yearTo and silently sending a broken range to the backend.
+    cy.visit('/carListings');
+    cy.get('[data-cy=yearTo-filter]').clear().type('2015').blur();
+    cy.get('[data-cy=yearFrom-filter]').should('have.attr', 'max', '2015');
+
+    cy.get('[data-cy=yearFrom-filter]').clear().type('2018').blur();
+    cy.get('[data-cy=yearTo-filter]').should('have.attr', 'min', '2018');
+    cy.screenshot('06-year-range-cross-bound');
+  });
 });
