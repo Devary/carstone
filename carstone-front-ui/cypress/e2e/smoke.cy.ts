@@ -91,4 +91,19 @@ describe('carstone-front-ui smoke', () => {
     cy.get('[data-cy=yearTo-filter]').should('have.attr', 'min', '2018');
     cy.screenshot('06-year-range-cross-bound');
   });
+
+  it('a year field can never be typed later than the current year', () => {
+    // Regression test for "max year cannot be in the future": CrudstoneField#noFutureValue on
+    // CarListing.year (context-gen) resolves onto both yearFrom/yearTo the same way minValue/
+    // maxValue/range already do — cappedMaxValue folds the current year into whatever maxValue
+    // this field would otherwise report, so the input's own [max] attribute reflects it directly
+    // (maxValue=2030 in the annotation is deliberately later than "now" — noFutureValue is what
+    // actually enforces the real constraint, proving the two are independently combined, not one
+    // replacing the other).
+    const currentYear = new Date().getFullYear();
+    cy.visit('/carListings');
+    cy.get('[data-cy=yearFrom-filter]').should('have.attr', 'max', String(currentYear));
+    cy.get('[data-cy=yearTo-filter]').should('have.attr', 'max', String(currentYear));
+    cy.screenshot('07-year-no-future-value');
+  });
 });

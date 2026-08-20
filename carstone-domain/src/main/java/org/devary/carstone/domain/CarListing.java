@@ -77,7 +77,11 @@ public class CarListing extends PanacheEntity {
     // motivated adding CrudstoneField#minValue/#maxValue in the first place (user-reported).
     // No range=true here: year stays two plain bounded inputs, not a slider (see price below
     // for the slider treatment) — a specific year is more naturally typed than dragged.
-    @CrudstoneField(type = "number", createEditType = "inputText", notNull = true, minValue = 1950, maxValue = 2030)
+    // noFutureValue=true: a listing can't claim a first-registration year later than the current
+    // one (user-reported) — the effective cap becomes min(maxValue, current year) every year,
+    // never a fixed value baked in here; maxValue=2030 is left as harmless future headroom rather
+    // than trimmed, since noFutureValue is what actually enforces the real-world constraint now.
+    @CrudstoneField(type = "number", createEditType = "inputText", notNull = true, minValue = 1950, maxValue = 2030, noFutureValue = true)
     @SearchResult(order = 4)
     private Integer year;
 
