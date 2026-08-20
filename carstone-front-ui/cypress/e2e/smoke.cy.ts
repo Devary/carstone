@@ -79,31 +79,35 @@ describe('carstone-front-ui smoke', () => {
   });
 
   it('a year "from" value can never be typed past the current "to" value, and vice versa', () => {
-    // Regression test for "year min cannot be greater than year max": rangeInputMinFor/
-    // rangeInputMaxFor bind each half's own <input min>/<max> to its sibling's CURRENT value, so
-    // the browser (and PrimeNG's own input handling) clamps a violating value at entry time
-    // instead of accepting yearFrom > yearTo and silently sending a broken range to the backend.
+    // Regression test for "year min cannot be greater than year max". The [min]/[max] HTML
+    // attribute alone (rangeInputMinFor/rangeInputMaxFor) is cosmetic — a native
+    // <input type="number"> still ACCEPTS a typed value past it, only the spinner arrows clamp
+    // (user-reported, in a follow-up: "i still can put 2033 in the max year", which is this same
+    // gap). setNumberFilter is what actually clamps the STORED value, so this asserts the input's
+    // own resulting .val() after typing an invalid combo, not just the attribute.
     cy.visit('/carListings');
     cy.get('[data-cy=yearTo-filter]').clear().type('2015').blur();
     cy.get('[data-cy=yearFrom-filter]').should('have.attr', 'max', '2015');
 
+    // typing yearFrom past yearTo's current value (2015) must clamp the STORED value down to 2015
     cy.get('[data-cy=yearFrom-filter]').clear().type('2018').blur();
-    cy.get('[data-cy=yearTo-filter]').should('have.attr', 'min', '2018');
+    cy.get('[data-cy=yearFrom-filter]').should('have.value', '2015');
+    cy.get('[data-cy=yearTo-filter]').should('have.attr', 'min', '2015');
     cy.screenshot('06-year-range-cross-bound');
   });
 
   it('a year field can never be typed later than the current year', () => {
-    // Regression test for "max year cannot be in the future": CrudstoneField#noFutureValue on
-    // CarListing.year (context-gen) resolves onto both yearFrom/yearTo the same way minValue/
-    // maxValue/range already do — cappedMaxValue folds the current year into whatever maxValue
-    // this field would otherwise report, so the input's own [max] attribute reflects it directly
-    // (maxValue=2030 in the annotation is deliberately later than "now" — noFutureValue is what
-    // actually enforces the real constraint, proving the two are independently combined, not one
-    // replacing the other).
+    // Regression test for "max year cannot be in the future", and for the same "attribute is
+    // cosmetic, not enforcement" gap the test above covers: typing a value past the [max]
+    // attribute (CrudstoneField#noFutureValue, resolved via cappedMaxValue) must clamp the
+    // STORED value down to the current year, not just show a non-blocking max attribute.
     const currentYear = new Date().getFullYear();
     cy.visit('/carListings');
     cy.get('[data-cy=yearFrom-filter]').should('have.attr', 'max', String(currentYear));
     cy.get('[data-cy=yearTo-filter]').should('have.attr', 'max', String(currentYear));
+
+    cy.get('[data-cy=yearTo-filter]').clear().type('2033').blur();
+    cy.get('[data-cy=yearTo-filter]').should('have.value', String(currentYear));
     cy.screenshot('07-year-no-future-value');
   });
 });
