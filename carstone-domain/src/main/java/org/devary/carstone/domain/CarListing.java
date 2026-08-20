@@ -52,48 +52,66 @@ import java.time.LocalDate;
 @Searchable(theme = "blue", externalResult = true)
 public class CarListing extends PanacheEntity {
 
+    // NOT external: with 10 external fields the main bar was too cramped to read any
+    // placeholder (user-reported) — only the 4 "major" concepts a real autoscout24-style search
+    // actually leads with (Brand, Model, Price range, Year range = 6 controls, exactly one
+    // 12-col row) stay always-visible; everything else moved into the "Filters" dropdown below.
     @CrudstoneField(type = "inputText", notNull = true)
-    @SearchableField(external = true, order = 1, style = "col-md-3")
+    @SearchableField(order = 6)
     @SearchResult(order = 1)
     private String title;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @CrudstoneField(type = "simpleSelect", listType = "brands", createEditType = "simpleSelect", promptView = true, notNull = true)
-    @SearchableField(external = true, order = 2, style = "col-md-2", single = true)
+    @SearchableField(external = true, order = 1, style = "col-md-2", single = true)
     @SearchResult(order = 2)
     private Brand brand;
 
     @CrudstoneField(type = "inputText")
-    @SearchableField(external = true, order = 3, style = "col-md-2")
+    @SearchableField(external = true, order = 2, style = "col-md-2")
     @SearchResult(order = 3)
     private String model;
 
-    @CrudstoneField(type = "number", createEditType = "inputText", notNull = true)
+    // minValue=1950: a real car's first-registration year never predates the automobile
+    // industry's own modern era — the field used to accept anything from 0, which is what
+    // motivated adding CrudstoneField#minValue/#maxValue in the first place (user-reported).
+    // No range=true here: year stays two plain bounded inputs, not a slider (see price below
+    // for the slider treatment) — a specific year is more naturally typed than dragged.
+    @CrudstoneField(type = "number", createEditType = "inputText", notNull = true, minValue = 1950, maxValue = 2030)
     @SearchResult(order = 4)
     private Integer year;
 
     @Transient
     @CrudstoneField(type = "number", createEditType = "inputText")
-    @SearchableField(external = true, order = 4, style = "col-md-2", rangeTarget = "year", dependency = FieldDependency.GREATER_THAN_OR_EQUAL)
+    @SearchableField(external = true, order = 5, style = "col-md-2", rangeTarget = "year", dependency = FieldDependency.GREATER_THAN_OR_EQUAL)
     private Integer yearFrom;
 
     @Transient
     @CrudstoneField(type = "number", createEditType = "inputText")
-    @SearchableField(external = true, order = 5, style = "col-md-2", rangeTarget = "year", dependency = FieldDependency.LESS_THAN_OR_EQUAL)
+    @SearchableField(external = true, order = 6, style = "col-md-2", rangeTarget = "year", dependency = FieldDependency.LESS_THAN_OR_EQUAL)
     private Integer yearTo;
 
-    @CrudstoneField(type = "number", createEditType = "inputText", notNull = true)
+    // minValue=500/maxValue=500_000: a real-world used-to-exotic car price range (also
+    // user-reported: the field previously accepted anything down to 0). range=true: the
+    // priceFrom/priceTo pair below renders as ONE PrimeNG dual-handle slider spanning this
+    // bound instead of two separate number inputs (search-crudstone's own new
+    // isRangeSliderFrom/isRangeSliderTo mechanism).
+    @CrudstoneField(type = "number", createEditType = "inputText", notNull = true, minValue = 500, maxValue = 500_000, range = true)
     @SearchResult(order = 5)
     private Integer price;
 
+    // style="col-md-4": priceFrom is now the ONLY rendered control for the pair (priceTo renders
+    // nothing of its own, see search-crudstone's isRangeSliderTo) — sized to the combined width
+    // both fields used to occupy separately (2+2), since a slider needs real room to drag in,
+    // unlike two narrow number inputs
     @Transient
     @CrudstoneField(type = "number", createEditType = "inputText")
-    @SearchableField(external = true, order = 6, style = "col-md-2", rangeTarget = "price", dependency = FieldDependency.GREATER_THAN_OR_EQUAL)
+    @SearchableField(external = true, order = 3, style = "col-md-4", rangeTarget = "price", dependency = FieldDependency.GREATER_THAN_OR_EQUAL)
     private Integer priceFrom;
 
     @Transient
     @CrudstoneField(type = "number", createEditType = "inputText")
-    @SearchableField(external = true, order = 7, style = "col-md-2", rangeTarget = "price", dependency = FieldDependency.LESS_THAN_OR_EQUAL)
+    @SearchableField(external = true, order = 4, style = "col-md-2", rangeTarget = "price", dependency = FieldDependency.LESS_THAN_OR_EQUAL)
     private Integer priceTo;
 
     @CrudstoneField(type = "number", createEditType = "inputText")
@@ -119,7 +137,7 @@ public class CarListing extends PanacheEntity {
     private Integer power;
 
     @CrudstoneField(type = "enum", enumClass = FuelType.class)
-    @SearchableField(external = true, order = 8, style = "col-md-2")
+    @SearchableField(order = 7)
     @SearchResult(order = 8)
     private String fuelType;
 
@@ -142,7 +160,7 @@ public class CarListing extends PanacheEntity {
     // client-side "must be present in the request" constraint would reject every legitimate
     // create/update before the handler ever gets a chance to fill it in.
     @CrudstoneField(type = "enum", enumClass = SellerType.class)
-    @SearchableField(external = true, order = 9, style = "col-md-2")
+    @SearchableField(order = 8)
     @SearchResult(order = 9)
     private String sellerType;
 
@@ -152,7 +170,7 @@ public class CarListing extends PanacheEntity {
     private Seller seller;
 
     @CrudstoneField(type = "inputText")
-    @SearchableField(external = true, order = 10, style = "col-md-2")
+    @SearchableField(order = 9)
     @SearchResult(order = 11)
     private String city;
 
