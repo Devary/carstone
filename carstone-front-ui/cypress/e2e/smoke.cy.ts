@@ -20,9 +20,13 @@ describe('carstone-front-ui smoke', () => {
   });
 
   it('a year range filter actually bounds the SQL query, not just the UI param', () => {
+    // CrudstoneField#yearPicker: yearFrom/yearTo render as a year-only PrimeNG date picker now,
+    // not a plain typeable <input> — open it via its dropdown icon and click a year cell (the
+    // panel is appendTo="body", so it lives outside [data-cy=yearFrom-filter] in the DOM).
     cy.intercept('GET', '**/carstone-front/carListings?*').as('search');
     cy.visit('/carListings');
-    cy.get('[data-cy=yearFrom-filter]').type('2022');
+    cy.get('[data-cy=yearFrom-filter] .p-datepicker-dropdown').click({force: true});
+    cy.get('.p-datepicker-panel').contains('.p-datepicker-year', '2022').click({force: true});
     cy.get('[data-cy=entity-search-run-button]').click({force: true});
     cy.wait('@search', {timeout: 10000}).its('request.url').should('include', 'yearMin=2022');
     cy.get('[data-cy=entity-search-result-card]', {timeout: 10000}).should('have.length.greaterThan', 0);
@@ -78,36 +82,31 @@ describe('carstone-front-ui smoke', () => {
     cy.screenshot('05-price-slider-interacted-twice');
   });
 
-  it('a year "from" value can never be typed past the current "to" value, and vice versa', () => {
-    // Regression test for "year min cannot be greater than year max". The [min]/[max] HTML
-    // attribute alone (rangeInputMinFor/rangeInputMaxFor) is cosmetic — a native
-    // <input type="number"> still ACCEPTS a typed value past it, only the spinner arrows clamp
-    // (user-reported, in a follow-up: "i still can put 2033 in the max year", which is this same
-    // gap). setNumberFilter is what actually clamps the STORED value, so this asserts the input's
-    // own resulting .val() after typing an invalid combo, not just the attribute.
+  it('a year "from" picker disables any year later than the current "to" selection, and vice versa', () => {
+    // Regression test for "year min cannot be greater than year max", now via the year-picker
+    // widget (CrudstoneField#yearPicker) instead of the plain-input clamp: pick yearTo=2022 (the
+    // year-view opens centered on the current decade, 2020-2029 — staying inside it avoids the
+    // "previous decade" nav button, which proved unreliable to drive through Cypress), then open
+    // yearFrom's OWN picker and assert 2025 (later than 2022) renders as a genuinely disabled
+    // cell — there's no typing path to bypass this at all anymore, unlike the plain-input case.
     cy.visit('/carListings');
-    cy.get('[data-cy=yearTo-filter]').clear().type('2015').blur();
-    cy.get('[data-cy=yearFrom-filter]').should('have.attr', 'max', '2015');
+    cy.get('[data-cy=yearTo-filter] .p-datepicker-dropdown').click({force: true});
+    cy.get('.p-datepicker-panel').contains('.p-datepicker-year', '2022').click({force: true});
 
-    // typing yearFrom past yearTo's current value (2015) must clamp the STORED value down to 2015
-    cy.get('[data-cy=yearFrom-filter]').clear().type('2018').blur();
-    cy.get('[data-cy=yearFrom-filter]').should('have.value', '2015');
-    cy.get('[data-cy=yearTo-filter]').should('have.attr', 'min', '2015');
+    cy.get('[data-cy=yearFrom-filter] .p-datepicker-dropdown').click({force: true});
+    cy.get('.p-datepicker-panel').contains('.p-datepicker-year', '2025').should('have.class', 'p-disabled');
     cy.screenshot('06-year-range-cross-bound');
   });
 
-  it('a year field can never be typed later than the current year', () => {
-    // Regression test for "max year cannot be in the future", and for the same "attribute is
-    // cosmetic, not enforcement" gap the test above covers: typing a value past the [max]
-    // attribute (CrudstoneField#noFutureValue, resolved via cappedMaxValue) must clamp the
-    // STORED value down to the current year, not just show a non-blocking max attribute.
-    const currentYear = new Date().getFullYear();
+  it('a year picker disables any year later than the current year', () => {
+    // Regression test for "max year cannot be in the future", now via the year-picker widget
+    // instead of a plain-input clamp (user-reported follow-up: "i still can put 2033 in the max
+    // year" — that report was about the earlier plain-input fix; the picker removes the typing
+    // path entirely, so this asserts the NEXT calendar year renders as a disabled cell).
+    const nextYear = new Date().getFullYear() + 1;
     cy.visit('/carListings');
-    cy.get('[data-cy=yearFrom-filter]').should('have.attr', 'max', String(currentYear));
-    cy.get('[data-cy=yearTo-filter]').should('have.attr', 'max', String(currentYear));
-
-    cy.get('[data-cy=yearTo-filter]').clear().type('2033').blur();
-    cy.get('[data-cy=yearTo-filter]').should('have.value', String(currentYear));
+    cy.get('[data-cy=yearTo-filter] .p-datepicker-dropdown').click({force: true});
+    cy.get('.p-datepicker-panel').contains('.p-datepicker-year', String(nextYear)).should('have.class', 'p-disabled');
     cy.screenshot('07-year-no-future-value');
   });
 });

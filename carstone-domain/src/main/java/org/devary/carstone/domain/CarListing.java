@@ -75,13 +75,16 @@ public class CarListing extends PanacheEntity {
     // minValue=1950: a real car's first-registration year never predates the automobile
     // industry's own modern era — the field used to accept anything from 0, which is what
     // motivated adding CrudstoneField#minValue/#maxValue in the first place (user-reported).
-    // No range=true here: year stays two plain bounded inputs, not a slider (see price below
-    // for the slider treatment) — a specific year is more naturally typed than dragged.
+    // No range=true here: year stays two separate year pickers, not a slider (see price below
+    // for the slider treatment) — a specific year is more naturally picked than dragged.
     // noFutureValue=true: a listing can't claim a first-registration year later than the current
     // one (user-reported) — the effective cap becomes min(maxValue, current year) every year,
     // never a fixed value baked in here; maxValue=2030 is left as harmless future headroom rather
     // than trimmed, since noFutureValue is what actually enforces the real-world constraint now.
-    @CrudstoneField(type = "number", createEditType = "inputText", notNull = true, minValue = 1950, maxValue = 2030, noFutureValue = true)
+    // yearPicker=true: the search filter renders as a year-only date picker instead of a plain
+    // number input (user-reported) — out-of-range years are disabled directly in the picker,
+    // rather than relying on a blur-time clamp the way the plain-input case still needs to.
+    @CrudstoneField(type = "number", createEditType = "inputText", notNull = true, minValue = 1950, maxValue = 2030, noFutureValue = true, yearPicker = true)
     @SearchResult(order = 4)
     private Integer year;
 
