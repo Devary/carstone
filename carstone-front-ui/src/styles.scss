@@ -21,6 +21,18 @@ html.app-dark body {
   min-height: 100vh;
 }
 
+html.app-dark {
+  // search-crudstone's own overridable --sc-* token system (see that library's README "Styling"
+  // section) — set from THIS host app's global stylesheet, zero library source touched. Pairs a
+  // translucent background with a nonzero blur on both the search bar's card and each result
+  // card, so they read as glass against the radial-gradient background above instead of a flat
+  // opaque panel. Scoped to dark mode only — light mode keeps the library's normal opaque default.
+  --sc-card-bg: color-mix(in srgb, var(--p-content-background, #18181b) 55%, transparent);
+  --sc-card-blur: 22px;
+  --sc-result-card-bg: color-mix(in srgb, var(--p-content-background, #18181b) 60%, transparent);
+  --sc-result-card-blur: 14px;
+}
+
 .p-dialog-mask {
   backdrop-filter: blur(6px);
 }
@@ -35,7 +47,7 @@ html.app-dark body {
 // tokens only.
 .page-backdrop {
   min-height: calc(100vh - 4rem);
-  padding: 1rem 1.5rem 3rem;
+  padding: 1.5rem 1.5rem 3rem;
   display: flex;
   flex-direction: column;
 }

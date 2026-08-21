@@ -1,7 +1,16 @@
 describe('carstone-front-ui smoke', () => {
-  it('lands on /carListings/results with a search bar and a results grid', () => {
+  it('the landing page renders a hero and links into the search page', () => {
+    // '/' used to redirect straight to /carListings — it's now a dedicated marketing landing
+    // page (user-requested), so /carListings is the direct search entry point instead.
     cy.visit('/');
+    cy.get('[data-cy=landing-hero]').should('be.visible').and('contain.text', 'Find your next car');
+    cy.get('[data-cy=landing-search-cta]').click();
     cy.url({timeout: 10000}).should('include', '/carListings');
+    cy.screenshot('00-landing-page');
+  });
+
+  it('lands on /carListings/results with a search bar and a results grid', () => {
+    cy.visit('/carListings');
     // title moved into the "Filters" dropdown (not external) once the always-visible bar was
     // trimmed to the 4 major fields (user-reported: too many external fields, couldn't read
     // any placeholder) - brand/model/price-range/year-range are what's left external
@@ -136,5 +145,28 @@ describe('carstone-front-ui smoke', () => {
     cy.get('[data-cy=contact-submit] button').click();
     cy.get('[data-cy=contact-success]').should('be.visible');
     cy.screenshot('09-contact-submitted');
+  });
+
+  it('a landing body-type category pre-fills the search bar filter without auto-searching', () => {
+    cy.intercept('GET', '**/carstone-front/carListings?*').as('search');
+    cy.visit('/');
+    cy.get('[data-cy="landing-category-SUV"]').click();
+    cy.url({timeout: 10000}).should('include', '/carListings').and('not.include', '/results');
+    // pre-filled via router-navigation `state`, not auto-searched — EntitySearchPageComponent
+    // hardcodes autoSearchOnInit=false, so the "Filters" dropdown shows 1 active filter but no
+    // request has fired yet
+    cy.get('[data-cy=entity-search-filters-button]').should('contain.text', '1');
+    cy.get('@search.all').should('have.length', 0);
+    cy.screenshot('10-landing-category-prefilled');
+  });
+
+  it('the header nav links to search/about/contact from anywhere', () => {
+    cy.visit('/about');
+    cy.get('[data-cy=site-header]').should('be.visible');
+    cy.get('[data-cy=site-header]').contains('a', 'Search').click();
+    cy.url().should('include', '/carListings');
+    cy.get('[data-cy=site-header]').contains('a', 'Carstone').click();
+    cy.url().should('eq', Cypress.config().baseUrl + '/');
+    cy.get('[data-cy=landing-hero]').should('be.visible');
   });
 });

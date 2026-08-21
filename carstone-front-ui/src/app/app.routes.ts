@@ -1,13 +1,14 @@
 import {Routes} from '@angular/router';
 import {EntitySearchPageComponent, EntitySearchResultsPageComponent} from 'searchcrudstone';
+import {LandingPageComponent} from './pages/landing/landing-page.component';
 import {AboutPageComponent} from './pages/about/about-page.component';
 import {ContactPageComponent} from './pages/contact/contact-page.component';
 
-// CarListing has @Searchable(externalResult = true) — landing on /carListings auto-navigates to
-// /carListings/results once a search runs (EntitySearchComponent's own externalResult handling),
-// which genuinely IS the "search+results page is the homepage" autoscout24 experience with no
-// extra redirect logic needed here beyond '' -> 'carListings'. Same route SHAPE as search-
-// crudstone's own demo app (':entity/results' + ':entity'), just with our own default entity.
+// CarListing has @Searchable(externalResult = true) — /carListings auto-navigates to
+// /carListings/results once a search runs (EntitySearchComponent's own externalResult handling).
+// '' now renders a dedicated marketing landing page (hero, stats, browse-by-body-type,
+// user-requested) instead of redirecting straight into the search bar — /carListings is still the
+// direct search entry point (linked from the landing page's own CTA, the footer, and the header).
 //
 // Deliberately 'carListings' (the entity's own NAME), not 'listings' (its admin-side PATH,
 // what carstone-admin-ui's sidebar links to) — EntitySearchComponent.runSearch() always builds
@@ -16,7 +17,7 @@ import {ContactPageComponent} from './pages/contact/contact-page.component';
 // results). Aliasing this app's own default to the same canonical name avoids ever fighting
 // that, rather than trying to make search-crudstone preserve an alias it has no concept of.
 export const routes: Routes = [
-  {path: '', redirectTo: 'carListings', pathMatch: 'full'},
+  {path: '', component: LandingPageComponent},
   // must come BEFORE the ':entity' catch-all below, or search-crudstone would try (and fail) to
   // load a search context named "about"/"contact"
   {path: 'about', component: AboutPageComponent},

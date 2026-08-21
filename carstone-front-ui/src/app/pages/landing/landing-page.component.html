@@ -1,0 +1,53 @@
+<div class="landing">
+  <section class="landing-hero" data-cy="landing-hero">
+    <h1>Find your next car</h1>
+    <p class="landing-hero-lede">
+      Thousands of listings from private sellers and trusted dealerships — search by brand,
+      price, and year in seconds.
+    </p>
+    <a routerLink="/carListings" class="landing-cta" data-cy="landing-search-cta">
+      <i class="pi pi-search"></i>
+      Start searching
+    </a>
+
+    <div class="landing-stats">
+      <div>
+        <strong>90+</strong>
+        <span>Active listings</span>
+      </div>
+      <div>
+        <strong>21</strong>
+        <span>Brands</span>
+      </div>
+      <div>
+        <strong>20</strong>
+        <span>Trusted sellers</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-categories">
+    <h2>Browse by body type</h2>
+    <div class="landing-category-grid" data-cy="landing-categories">
+      @for (bodyType of bodyTypes; track bodyType.value) {
+        <a
+          class="landing-category-chip"
+          routerLink="/carListings"
+          [state]="{filterValues: {bodyType: bodyType.value}}"
+          [attr.data-cy]="'landing-category-' + bodyType.value"
+        >
+          <i class="pi" [class]="bodyType.icon"></i>
+          <span>{{ bodyType.label }}</span>
+        </a>
+      }
+    </div>
+  </section>
+
+  <section class="landing-cta-band glass-card">
+    <div>
+      <h2>Selling your car?</h2>
+      <p>List it in minutes and reach thousands of buyers.</p>
+    </div>
+    <a routerLink="/contact" class="landing-cta landing-cta-secondary">Get in touch</a>
+  </section>
+</div>

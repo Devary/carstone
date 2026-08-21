@@ -1,19 +1,61 @@
+// sticky, not fixed: reserves its own space in normal document flow (pushes every routed page's
+// content down automatically, no per-page top-padding patch needed anywhere — including
+// search-crudstone's own .results-page, which has no top-clearance override token to hook into)
+// while still staying pinned once the page scrolls past it. Same backdrop-filter-over-translucent
+// -surface technique as sf-footer/.glass-card for the glass look itself.
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  height: 4.5rem;
+  padding: 0 1.5rem;
+  background: color-mix(in srgb, var(--p-content-background, #18181b) 70%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid color-mix(in srgb, var(--p-primary-color, #3b82f6) 15%, transparent);
+}
+
+.site-header-logo {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--p-text-color);
+  text-decoration: none;
+}
+
+.site-header-nav {
+  display: flex;
+  gap: 1.5rem;
+  margin-right: auto;
+}
+
+.site-header-nav a {
+  color: var(--p-text-muted-color);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.15s;
+}
+
+.site-header-nav a:hover,
+.site-header-nav a.active {
+  color: var(--p-primary-color);
+}
+
 .dark-toggle {
-  position: fixed;
-  top: 1rem;
-  right: 1rem;
-  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.25rem;
+  height: 2.25rem;
   border: 1px solid var(--p-content-border-color);
   border-radius: 50%;
   background: var(--p-content-background);
   color: var(--p-text-muted-color);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: background 0.15s, color 0.15s;
 }
 

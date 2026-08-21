@@ -1,12 +1,20 @@
+<header class="site-header" data-cy="site-header">
+  <a routerLink="/" class="site-header-logo">Carstone</a>
+  <nav class="site-header-nav">
+    <a routerLink="/carListings" routerLinkActive="active">Search</a>
+    <a routerLink="/about" routerLinkActive="active">About</a>
+    <a routerLink="/contact" routerLinkActive="active">Contact</a>
+  </nav>
+  <button
+    type="button"
+    class="dark-toggle"
+    data-cy="dark-toggle"
+    (click)="toggleDark()"
+    [attr.aria-label]="dark() ? 'Switch to light mode' : 'Switch to dark mode'"
+  >
+    <i class="pi" [class.pi-moon]="!dark()" [class.pi-sun]="dark()"></i>
+  </button>
+</header>
 <router-outlet/>
 <sf-footer [config]="footerConfig" />
 <p-toast/>
-<button
-  type="button"
-  class="dark-toggle"
-  data-cy="dark-toggle"
-  (click)="toggleDark()"
-  [attr.aria-label]="dark() ? 'Switch to light mode' : 'Switch to dark mode'"
->
-  <i class="pi" [class.pi-moon]="!dark()" [class.pi-sun]="dark()"></i>
-</button>
