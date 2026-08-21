@@ -28,6 +28,24 @@ describe('carstone-front-ui smoke', () => {
     cy.screenshot('01-results-page');
   });
 
+  it('year filter fields render with their full, distinguishable From/To label', () => {
+    // Regression test for "the years addition is not good and proper": yearFrom/yearTo went from
+    // col-md-2 to col-md-3 (CarListing.java), and the search bar's own card gained a
+    // --sc-card-min-width override (1100px, styles.scss) — the year-only picker's own icon left
+    // no room next to a plain number input's old col-md-2/900px-card combination, both fields
+    // collapsing to the same unreadable "Ye" with no visual way to tell From/To apart (confirmed
+    // fixed via manual screenshot inspection — an input's own outerWidth doesn't reliably
+    // indicate whether its placeholder text is visually legible, since overflowing placeholder
+    // text isn't necessarily clipped at the box edge, so that's not asserted on here). This
+    // covers the part of the regression that IS reliably assertable: the label text driving what
+    // renders is the full, distinct "Year From"/"Year To" — not some already-abbreviated string.
+    cy.viewport(1280, 720);
+    cy.visit('/carListings');
+    cy.get('[data-cy=yearFrom-filter] input').should('have.attr', 'placeholder', 'Year From');
+    cy.get('[data-cy=yearTo-filter] input').should('have.attr', 'placeholder', 'Year To');
+    cy.screenshot('11-year-fields-readable');
+  });
+
   it('a year range filter actually bounds the SQL query, not just the UI param', () => {
     // CrudstoneField#yearPicker: yearFrom/yearTo render as a year-only PrimeNG date picker now,
     // not a plain typeable <input> — open it via its dropdown icon and click a year cell (the
@@ -131,6 +149,22 @@ describe('carstone-front-ui smoke', () => {
     cy.url().should('include', '/contact');
     cy.get('[data-cy=contact-page]').should('be.visible');
     cy.screenshot('08-footer-and-pages');
+  });
+
+  it('the footer stays pinned to the bottom of the viewport on a short-content page', () => {
+    // Regression test for "footer must be at the bottom of the page not relative to the
+    // searchbar": on a page shorter than the viewport (the bare search bar, no results yet), the
+    // footer used to sit right after the search bar's own content instead of at the true bottom
+    // of the viewport. app.component's :host is now a full-viewport-height flex column with
+    // .site-main set to flex-grow, absorbing the leftover space so the footer's own bottom edge
+    // always reaches the viewport's bottom edge, regardless of viewport height.
+    cy.viewport(1280, 1200);
+    cy.visit('/carListings');
+    cy.get('[data-cy=brand-external-filter]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=site-footer]').then($footer => {
+      const rect = $footer[0].getBoundingClientRect();
+      expect(Math.round(rect.bottom)).to.be.closeTo(1200, 2);
+    });
   });
 
   it('the contact form submits and shows a confirmation', () => {

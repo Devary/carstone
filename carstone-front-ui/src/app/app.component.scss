@@ -1,3 +1,20 @@
+// sticky-footer layout: app-root itself becomes a full-viewport-tall flex column (header /
+// .site-main / sf-footer), with .site-main set to grow (flex: 1 0 auto) and absorb any leftover
+// space — user-reported the footer was sitting right below the search bar on a short-content page
+// (e.g. the bare search bar with no results yet) instead of pinned to the actual bottom of the
+// viewport. A page whose OWN content is taller than the viewport still pushes the footer below it
+// normally (flex-grow only ever adds space, it can't shrink .site-main below its content's own
+// height) — this only fixes the short-content case, nothing about the tall-content case changes.
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.site-main {
+  flex: 1 0 auto;
+}
+
 // sticky, not fixed: reserves its own space in normal document flow (pushes every routed page's
 // content down automatically, no per-page top-padding patch needed anywhere — including
 // search-crudstone's own .results-page, which has no top-clearance override token to hook into)
@@ -7,6 +24,7 @@
   position: sticky;
   top: 0;
   z-index: 900;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   gap: 2rem;

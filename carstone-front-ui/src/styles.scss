@@ -6,6 +6,15 @@ body {
   font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+:root {
+  // search-crudstone's --sc-* override system again (not dark-mode-scoped like the glass tokens
+  // below — this is a layout concern, independent of theme): CarListing has 5 external search
+  // fields (brand/model/price-range/year-range), one more than the library's own 900px default
+  // assumes room for — user-reported the year-range picker fields read as cramped/truncated
+  // ("Ye" instead of "Year", no visible way to tell "From" from "To") at everyday desktop widths.
+  --sc-card-min-width: 1100px;
+}
+
 html.app-dark body {
   // dark blurry background: a fixed multi-glow gradient (never a flat color) so translucent
   // glass surfaces above it (the search bar, .glass-card, sf-footer) actually have something to

@@ -88,14 +88,19 @@ public class CarListing extends PanacheEntity {
     @SearchResult(order = 4)
     private Integer year;
 
+    // style="col-md-3" (up from col-md-2, user-reported the pair looked cramped/truncated once
+    // it became a date-picker button+icon instead of a plain number input — a narrower column
+    // that read fine as "Yea|" of bare text left no room once an icon competed for the same
+    // space, both fields collapsing to the same unreadable "Ye" placeholder with no visual way
+    // to tell From/To apart). priceFrom below gives back the column this borrows.
     @Transient
     @CrudstoneField(type = "number", createEditType = "inputText")
-    @SearchableField(external = true, order = 5, style = "col-md-2", rangeTarget = "year", dependency = FieldDependency.GREATER_THAN_OR_EQUAL)
+    @SearchableField(external = true, order = 5, style = "col-md-3", rangeTarget = "year", dependency = FieldDependency.GREATER_THAN_OR_EQUAL)
     private Integer yearFrom;
 
     @Transient
     @CrudstoneField(type = "number", createEditType = "inputText")
-    @SearchableField(external = true, order = 6, style = "col-md-2", rangeTarget = "year", dependency = FieldDependency.LESS_THAN_OR_EQUAL)
+    @SearchableField(external = true, order = 6, style = "col-md-3", rangeTarget = "year", dependency = FieldDependency.LESS_THAN_OR_EQUAL)
     private Integer yearTo;
 
     // minValue=500/maxValue=500_000: a real-world used-to-exotic car price range (also
@@ -107,13 +112,14 @@ public class CarListing extends PanacheEntity {
     @SearchResult(order = 5)
     private Integer price;
 
-    // style="col-md-4": priceFrom is now the ONLY rendered control for the pair (priceTo renders
-    // nothing of its own, see search-crudstone's isRangeSliderTo) — sized to the combined width
-    // both fields used to occupy separately (2+2), since a slider needs real room to drag in,
-    // unlike two narrow number inputs
+    // style="col-md-3" (down from col-md-4, giving that column back to yearFrom/yearTo above,
+    // which needed it more — a slider's own label already reads compactly as "Price From: 500 –
+    // 500000" regardless of the track's pixel width, unlike a picker button competing with an
+    // icon for a readable placeholder): priceFrom is the ONLY rendered control for the pair
+    // (priceTo renders nothing of its own, see search-crudstone's isRangeSliderTo).
     @Transient
     @CrudstoneField(type = "number", createEditType = "inputText")
-    @SearchableField(external = true, order = 3, style = "col-md-4", rangeTarget = "price", dependency = FieldDependency.GREATER_THAN_OR_EQUAL)
+    @SearchableField(external = true, order = 3, style = "col-md-3", rangeTarget = "price", dependency = FieldDependency.GREATER_THAN_OR_EQUAL)
     private Integer priceFrom;
 
     @Transient
