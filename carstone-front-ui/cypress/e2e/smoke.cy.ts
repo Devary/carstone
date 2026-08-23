@@ -78,10 +78,24 @@ describe('carstone-front-ui smoke', () => {
     cy.screenshot('03-price-range-filtered');
   });
 
-  it('results show images and can be selected', () => {
+  it('selecting a result navigates to a detail page, and Back returns to the results (not the search bar)', () => {
     cy.visit('/carListings');
+    // wait for the search context (incl. externalResult) to finish loading before clicking —
+    // otherwise Search can race ahead of it and fall back to an in-place search instead of
+    // navigating to /results, same warm-up the other tests in this file already do
+    cy.get('[data-cy=brand-external-filter]', {timeout: 10000}).should('be.visible');
     cy.get('[data-cy=entity-search-run-button]').click({force: true});
+    cy.url({timeout: 10000}).should('include', '/carListings/results');
     cy.get('[data-cy=entity-search-result-card]', {timeout: 10000}).first().click({force: true});
+    cy.url({timeout: 10000}).should('match', /\/carListings\/\d+$/);
+    cy.get('[data-cy=entity-detail-page]').should('be.visible');
+    cy.get('[data-cy=entity-detail-gallery]').should('be.visible');
+    cy.get('[data-cy=brand-detail-field]').should('be.visible');
+    cy.get('[data-cy=price-detail-field]').should('be.visible');
+    cy.get('[data-cy=entity-detail-back]').click();
+    // must land back on the RESULTS page (with its grid restored), not the bare compact search bar
+    cy.url({timeout: 10000}).should('include', '/carListings/results');
+    cy.get('[data-cy=entity-search-result-card]', {timeout: 10000}).should('have.length.greaterThan', 0);
     cy.screenshot('04-result-selected');
   });
 

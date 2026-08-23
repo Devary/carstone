@@ -1,5 +1,5 @@
 import {Routes} from '@angular/router';
-import {EntitySearchPageComponent, EntitySearchResultsPageComponent} from 'searchcrudstone';
+import {EntityDetailPageComponent, EntitySearchPageComponent, EntitySearchResultsPageComponent} from 'searchcrudstone';
 import {LandingPageComponent} from './pages/landing/landing-page.component';
 import {AboutPageComponent} from './pages/about/about-page.component';
 import {ContactPageComponent} from './pages/contact/contact-page.component';
@@ -23,5 +23,6 @@ export const routes: Routes = [
   {path: 'about', component: AboutPageComponent},
   {path: 'contact', component: ContactPageComponent},
   {path: ':entity/results', component: EntitySearchResultsPageComponent},
+  {path: ':entity/:id', component: EntityDetailPageComponent},
   {path: ':entity', component: EntitySearchPageComponent},
 ];
