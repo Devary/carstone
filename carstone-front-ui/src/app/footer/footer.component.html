@@ -1,30 +1,79 @@
-<footer class="sf-footer" data-cy="site-footer">
-  <div class="sf-footer-glow"></div>
-  <div class="sf-footer-content">
-    <div class="sf-footer-brand">
-      <div class="sf-footer-logo">{{ config().brand }}</div>
-      <p class="sf-footer-tagline">{{ config().tagline }}</p>
-      <div class="sf-footer-social">
-        @for (social of config().socialLinks; track social.label) {
-          <a [href]="social.href" [attr.aria-label]="social.label" class="sf-footer-social-link" target="_blank" rel="noopener">
-            <i class="pi" [class]="social.icon"></i>
-          </a>
-        }
-      </div>
-    </div>
-
-    @for (column of config().columns; track column.title) {
-      <div class="sf-footer-column">
-        <h4>{{ column.title }}</h4>
-        <ul>
-          @for (link of column.links; track link.path) {
-            <li><a [routerLink]="link.path">{{ link.label }}</a></li>
+@if (footer(); as f) {
+  <footer class="sf-footer" data-cy="site-footer">
+    <div class="sf-footer-glow"></div>
+    <div class="sf-footer-content">
+      @if (f.title) {
+        <div class="sf-footer-title" data-cy="site-footer-title">{{ f.title }}</div>
+      }
+      @for (section of f.sections; track $index) {
+        <div class="sf-footer-section" [class]="section.style">
+          @if (section.title) {
+            <h4>{{ section.title }}</h4>
           }
-        </ul>
-      </div>
-    }
-  </div>
-  <div class="sf-footer-bottom">
-    <span>{{ config().copyright }} &copy; {{ year }}</span>
-  </div>
-</footer>
+          @if (section.logo) {
+            <img class="sf-footer-section-logo" [src]="section.logo" [alt]="section.title ?? ''" />
+          }
+          @if (section.description) {
+            <p class="sf-footer-description">{{ section.description }}</p>
+          }
+          @if (section.links.length) {
+            <ul class="sf-footer-links">
+              @for (link of section.links; track link.label) {
+                <li>
+                  @if (isExternal(link.url)) {
+                    <a [href]="link.url" [attr.aria-label]="link.label" [class.sf-footer-link--icon]="!!link.logo"
+                       target="_blank" rel="noopener">
+                      @if (link.logo) {
+                        @if (isIconClass(link.logo)) {
+                          <i [class]="link.logo"></i>
+                        } @else {
+                          <img [src]="link.logo" [alt]="link.label" />
+                        }
+                      } @else {
+                        {{ link.label }}
+                      }
+                    </a>
+                  } @else {
+                    <a [routerLink]="link.url" [attr.aria-label]="link.label" [class.sf-footer-link--icon]="!!link.logo">
+                      @if (link.logo) {
+                        @if (isIconClass(link.logo)) {
+                          <i [class]="link.logo"></i>
+                        } @else {
+                          <img [src]="link.logo" [alt]="link.label" />
+                        }
+                      } @else {
+                        {{ link.label }}
+                      }
+                    </a>
+                  }
+                </li>
+              }
+            </ul>
+          }
+          @if (section.input || section.buttons.length) {
+            <div class="sf-footer-cta">
+              @if (section.input; as fieldInput) {
+                <input
+                  class="sf-footer-input"
+                  [type]="fieldInput.type"
+                  [placeholder]="fieldInput.placeholder"
+                  [name]="fieldInput.name"
+                  [attr.data-cy]="fieldInput.name + '-footer-input'"
+                />
+              }
+              @for (button of section.buttons; track button.label) {
+                <a class="sf-footer-button" [href]="button.href" [attr.data-cy]="'footer-button-' + button.label">{{ button.label }}</a>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+    <div class="sf-footer-bottom">
+      @if (f.copyrightHtml) {
+        <span [innerHTML]="f.copyrightHtml"></span>
+      }
+      &copy; {{ year }}
+    </div>
+  </footer>
+}

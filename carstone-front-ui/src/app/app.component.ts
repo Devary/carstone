@@ -3,7 +3,6 @@ import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {Toast} from 'primeng/toast';
 import {themeVars} from 'searchcrudstone';
 import {FooterComponent} from './footer/footer.component';
-import {FooterConfig} from './footer/footer.model';
 
 @Component({
   selector: 'app-root',
@@ -26,32 +25,6 @@ export class AppComponent {
    * Defaults to true (unlike the sibling apps, which default false): this app's whole dark/blurry
    * glassmorphism look (user-requested) only renders under html.app-dark — still user-togglable. */
   protected readonly dark = signal(localStorage.getItem('darkMode') !== 'false');
-
-  protected readonly footerConfig: FooterConfig = {
-    brand: 'Carstone',
-    tagline: 'The marketplace for buying and selling cars — private sellers and dealerships alike.',
-    columns: [
-      {
-        title: 'Company',
-        links: [
-          {label: 'About us', path: '/about'},
-          {label: 'Contact us', path: '/contact'},
-        ],
-      },
-      {
-        title: 'Browse',
-        links: [
-          {label: 'Search listings', path: '/carListings'},
-        ],
-      },
-    ],
-    socialLinks: [
-      {label: 'Facebook', href: 'https://facebook.com', icon: 'pi-facebook'},
-      {label: 'Instagram', href: 'https://instagram.com', icon: 'pi-instagram'},
-      {label: 'X', href: 'https://x.com', icon: 'pi-twitter'},
-    ],
-    copyright: 'Carstone',
-  };
 
   constructor() {
     effect(() => {
