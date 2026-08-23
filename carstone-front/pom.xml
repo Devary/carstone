@@ -45,6 +45,16 @@
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-reactive-pg-client</artifactId>
         </dependency>
+        <!-- MainContactFormHandler's own "send to an external mailing service" example. Dev/test
+             mode never touches a real SMTP server — Quarkus mocks Mailer by default there
+             (quarkus.mailer.mock, true unless overridden), capturing sent mails instead, visible
+             in Dev UI's own Mailer panel. A real deployment sets quarkus.mailer.{host,port,
+             username,password,...} (or swaps this handler for a different service's HTTP client
+             entirely — ContactFormHandler doesn't care which). -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-mailer</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>

@@ -26,7 +26,15 @@
         <span>Message</span>
         <textarea pTextarea name="message" rows="5" [(ngModel)]="message" required data-cy="contact-message"></textarea>
       </label>
-      <p-button type="button" label="Send message" icon="pi pi-send" [disabled]="form.invalid" (onClick)="submit()" data-cy="contact-submit" />
+      <p-button
+        type="button"
+        label="Send message"
+        icon="pi pi-send"
+        [loading]="submitting()"
+        [disabled]="form.invalid || submitting()"
+        (onClick)="submit()"
+        data-cy="contact-submit"
+      />
     </form>
   </div>
 </div>

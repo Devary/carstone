@@ -1,9 +1,11 @@
-import {Component, signal} from '@angular/core';
+import {Component, inject, signal} from '@angular/core';
 import {FormsModule} from '@angular/forms';
+import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {InputTextModule} from 'primeng/inputtext';
 import {Textarea} from 'primeng/textarea';
 import {Button} from 'primeng/button';
 import {MessageService} from 'primeng/api';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-contact-page',
@@ -21,17 +23,42 @@ export class ContactPageComponent {
   protected email = '';
   protected message = '';
   protected readonly submitted = signal(false);
+  protected readonly submitting = signal(false);
+
+  private readonly http = inject(HttpClient);
 
   constructor(private readonly messages: MessageService) {
   }
 
-  // no backend endpoint exists for this yet (a real submission target is a separate, later
-  // concern) — this is the page/UX the user asked for, submitting locally confirms the flow
+  // POSTs to context-gen's own generic ContactFormResource (GET/POST /contact-form/{name}) —
+  // carstone-front's MainContactForm declares this form's fields, MainContactFormHandler forwards
+  // a valid submission as an email via Quarkus' own mailer extension. A 400 here means a required
+  // field was blank (shouldn't happen — the button's own [disabled]="form.invalid" already
+  // prevents that, this only covers a submission somehow reaching here anyway); a 501 means no
+  // handler is registered at all (a deployment misconfiguration, not a user-facing input problem).
   protected submit(): void {
-    this.submitted.set(true);
-    this.messages.add({severity: 'success', summary: 'Message sent', detail: 'We will get back to you shortly.'});
-    this.name = '';
-    this.email = '';
-    this.message = '';
+    this.submitting.set(true);
+    this.http.post(`${environment.apiUrl}contact-form/main`, {
+      name: this.name,
+      email: this.email,
+      message: this.message,
+    }).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.submitted.set(true);
+        this.messages.add({severity: 'success', summary: 'Message sent', detail: 'We will get back to you shortly.'});
+        this.name = '';
+        this.email = '';
+        this.message = '';
+      },
+      error: (error: HttpErrorResponse) => {
+        this.submitting.set(false);
+        this.messages.add({
+          severity: 'error',
+          summary: 'Message not sent',
+          detail: typeof error.error === 'string' ? error.error : 'Something went wrong — please try again.',
+        });
+      },
+    });
   }
 }
