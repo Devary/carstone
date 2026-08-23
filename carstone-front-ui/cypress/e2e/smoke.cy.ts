@@ -99,6 +99,32 @@ describe('carstone-front-ui smoke', () => {
     cy.screenshot('04-result-selected');
   });
 
+  it('a filter changed LIVE on the results page (after the initial search) survives Back, not just the original snapshot', () => {
+    // Regression test for "when i go back filters resets, and it's not our case": the results
+    // page's own sidebar filters live (every change re-runs the search in place, no further
+    // navigation) - selecting a row must carry the sidebar's CURRENT filterValues back out via
+    // Back, not whatever the compact bar's original Search click happened to carry over.
+    cy.intercept('GET', '**/carstone-front/carListings?*').as('search');
+    cy.visit('/carListings');
+    cy.get('[data-cy=brand-external-filter]', {timeout: 10000}).should('be.visible');
+    cy.get('[data-cy=entity-search-run-button]').click({force: true});
+    cy.url({timeout: 10000}).should('include', '/carListings/results');
+    cy.get('[data-cy=entity-search-result-card]', {timeout: 10000}).should('have.length.greaterThan', 0);
+
+    // tweak a filter LIVE, after already landing on the results page (no Search button here)
+    cy.get('[data-cy=priceFrom-filter] .p-slider').click(5, 8, {force: true});
+    cy.get('[data-cy=priceFrom-filter]').should('contain.text', '7845');
+
+    cy.get('[data-cy=entity-search-result-card]', {timeout: 10000}).first().click({force: true});
+    cy.url({timeout: 10000}).should('match', /\/carListings\/\d+$/);
+
+    cy.intercept('GET', '**/carstone-front/carListings?*').as('searchAfterBack');
+    cy.get('[data-cy=entity-detail-back]').click();
+    cy.url({timeout: 10000}).should('include', '/carListings/results');
+    cy.wait('@searchAfterBack', {timeout: 10000}).its('request.url').should('include', 'filter.priceMin=7845');
+    cy.get('[data-cy=priceFrom-filter]', {timeout: 10000}).should('contain.text', '7845');
+  });
+
   it('interacting with the price slider twice in a row keeps advancing instead of snapping back', () => {
     // Regression test for the "range is not moving, it's like blocked" report: rangeSliderValueOf
     // used to read straight from filterValues(), which doesn't change until onSlideEnd, so every
