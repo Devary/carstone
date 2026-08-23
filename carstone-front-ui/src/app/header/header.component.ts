@@ -2,7 +2,7 @@ import {Component, computed, HostListener, inject, input, signal} from '@angular
 import {toObservable, toSignal} from '@angular/core/rxjs-interop';
 import {HttpClient} from '@angular/common/http';
 import {NgTemplateOutlet} from '@angular/common';
-import {RouterLink, RouterLinkActive} from '@angular/router';
+import {Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {switchMap} from 'rxjs';
 import {themeVars} from 'searchcrudstone';
 import {environment} from '../../environments/environment';
@@ -38,6 +38,7 @@ export class HeaderComponent {
   readonly name = input<string>('main');
 
   private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
 
   protected readonly header = toSignal(
     toObservable(this.name).pipe(
@@ -72,5 +73,27 @@ export class HeaderComponent {
   @HostListener('document:click')
   protected closeOnOutsideClick(): void {
     this.openTrigger.set(null);
+  }
+
+  // a link's own url MAY carry a "?field=value" pair (see MainHeader's own header comment) —
+  // context-gen's @Header contract only knows a link as a plain label+url, it has no concept of
+  // a search filter; encoding it in the url and decoding it back out here is what turns a mega
+  // menu entry like "SUV" into an ACTUAL pre-filtered search instead of just a page load. A plain
+  // [routerLink] can't carry navigation state at all, so a query-string link renders as a plain
+  // href (real, working without JS — a fallback for ctrl-click/hover-preview/no-JS) but is
+  // intercepted on click and replayed as a stateful navigation instead — the exact mechanism the
+  // landing page's own "Browse by body type" cards already use.
+  protected hasFilter(url: string): boolean {
+    return url.includes('?');
+  }
+
+  protected navigateWithFilter(url: string, event: Event): void {
+    event.preventDefault();
+    const [path, queryString] = url.split('?');
+    const filterValues: Record<string, string> = {};
+    new URLSearchParams(queryString).forEach((value, key) => {
+      filterValues[key] = value;
+    });
+    this.router.navigate([path], {state: {filterValues}});
   }
 }

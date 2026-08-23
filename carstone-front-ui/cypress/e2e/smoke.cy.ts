@@ -234,13 +234,46 @@ describe('carstone-front-ui smoke', () => {
     cy.screenshot('10-landing-category-prefilled');
   });
 
-  it('the header nav links to search/about/contact from anywhere', () => {
+  // the header is now a real mega menu (@Header, MEGA_MENU variant) — "Search" isn't a bare
+  // top-level link anymore, it's behind the "Company" section's own dropdown panel
+  it('the header mega menu links to search/about/contact from anywhere', () => {
     cy.visit('/about');
     cy.get('[data-cy=site-header]').should('be.visible');
-    cy.get('[data-cy=site-header]').contains('a', 'Search').click();
+    cy.get('[data-cy="header-trigger-Company"]').click();
+    cy.get('[data-cy="header-link-Search all listings"]').click();
     cy.url().should('include', '/carListings');
     cy.get('[data-cy=site-header]').contains('a', 'Carstone').click();
     cy.url().should('eq', Cypress.config().baseUrl + '/');
     cy.get('[data-cy=landing-hero]').should('be.visible');
+  });
+
+  it('the header mega menu has all 5 sections with at least 30 links total', () => {
+    cy.visit('/');
+    const sections = ['Body Type', 'Fuel Type', 'Color', 'Buying Options', 'Company'];
+    let total = 0;
+    cy.wrap(sections).each((title: string) => {
+      cy.get(`[data-cy="header-trigger-${title}"]`).click({force: true});
+      cy.get(`[data-cy="header-panel-${title}"]`).should('be.visible')
+        .find('a').its('length').then(count => {
+          total += count;
+        });
+      cy.get(`[data-cy="header-trigger-${title}"]`).click({force: true}); // close it again
+    }).then(() => {
+      expect(total).to.be.at.least(30);
+    });
+  });
+
+  // a mega-menu link's own url carries a "?field=value" pair — clicking it must pre-fill the
+  // search bar via router state (same mechanism the landing page's own body-type cards use), not
+  // just land on a bare, unfiltered /carListings
+  it('a mega menu link with a query-string url pre-fills the search bar filter', () => {
+    cy.intercept('GET', '**/carstone-front/carListings?*').as('search');
+    cy.visit('/');
+    cy.get('[data-cy="header-trigger-Body Type"]').click();
+    cy.get('[data-cy="header-link-SUV"]').click();
+    cy.url({timeout: 10000}).should('include', '/carListings').and('not.include', '/results');
+    cy.get('[data-cy=entity-search-filters-button]').should('contain.text', '1');
+    cy.get('@search.all').should('have.length', 0);
+    cy.screenshot('12-header-megamenu-prefilled');
   });
 });

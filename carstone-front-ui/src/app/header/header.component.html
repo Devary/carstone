@@ -26,11 +26,23 @@
   </nav>
 }
 
+<!-- a single link entry, reused everywhere one is rendered: a plain path uses [routerLink] as
+     usual; a "?field=value" path (see hasFilter's own comment) still gets a real href — for
+     ctrl-click/hover-preview/no-JS — but is replayed as a stateful pre-filtered navigation on
+     click instead of a bare page load -->
+<ng-template #linkAnchor let-link let-cls="cls">
+  @if (hasFilter(link.url)) {
+    <a [attr.href]="link.url" (click)="navigateWithFilter(link.url, $event)" [class]="cls" [attr.data-cy]="'header-link-' + link.label">{{ link.label }}</a>
+  } @else {
+    <a [routerLink]="link.url" routerLinkActive="active" [class]="cls" [attr.data-cy]="'header-link-' + link.label">{{ link.label }}</a>
+  }
+</ng-template>
+
 <!-- a top-level entry in the flat simple_menu row: a plain link, or a dropdown trigger opening a
      single-column panel of its own children -->
 <ng-template #topLevelLink let-link>
   @if (link.type === 'link') {
-    <a [routerLink]="link.url" routerLinkActive="active" class="sh-header-link" [attr.data-cy]="'header-link-' + link.label">{{ link.label }}</a>
+    <ng-container *ngTemplateOutlet="linkAnchor; context: {$implicit: link, cls: 'sh-header-link'}" />
   } @else {
     <div class="sh-header-item" [class.sh-header-item--open]="isOpen(link)">
       <button type="button" class="sh-header-trigger" (click)="toggle(link, $event)" [attr.data-cy]="'header-trigger-' + link.label">
@@ -40,7 +52,7 @@
       @if (isOpen(link)) {
         <div class="sh-header-panel" [attr.data-cy]="'header-panel-' + link.label">
           @for (child of link.children; track child.label) {
-            <a [routerLink]="child.url" class="sh-header-panel-link">{{ child.label }}</a>
+            <ng-container *ngTemplateOutlet="linkAnchor; context: {$implicit: child, cls: 'sh-header-panel-link'}" />
           }
         </div>
       }
@@ -52,12 +64,12 @@
      children) — a plain link, or a further nested group with its own heading -->
 <ng-template #panelEntry let-link>
   @if (link.type === 'link') {
-    <a [routerLink]="link.url" class="sh-header-panel-link">{{ link.label }}</a>
+    <ng-container *ngTemplateOutlet="linkAnchor; context: {$implicit: link, cls: 'sh-header-panel-link'}" />
   } @else {
     <div class="sh-header-panel-group">
       <span class="sh-header-panel-heading">{{ link.label }}</span>
       @for (child of link.children; track child.label) {
-        <a [routerLink]="child.url" class="sh-header-panel-link">{{ child.label }}</a>
+        <ng-container *ngTemplateOutlet="linkAnchor; context: {$implicit: child, cls: 'sh-header-panel-link'}" />
       }
     </div>
   }

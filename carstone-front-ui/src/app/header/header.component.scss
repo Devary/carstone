@@ -94,12 +94,17 @@
   box-shadow: 0 12px 36px color-mix(in srgb, black 30%, transparent);
 }
 
-// a mega-menu panel is wider and lays its own entries out as a row of groups (each a column),
-// rather than the plain single-column list a simple-menu dropdown panel is
+// a mega-menu panel: however many links a section declares (carstone's own Body Type/Fuel Type/
+// Color sections run 6-10 each) auto-flow into columns of up to 6 rows apiece, instead of one
+// long single-column list or an unbounded single row — a real section this size needs actual
+// wrapping, not just "wider".
 .sh-header-panel--mega {
-  flex-direction: row;
-  min-width: 24rem;
-  gap: 2rem;
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(6, auto);
+  gap: 0.25rem 1.5rem;
+  min-width: 14rem;
+  max-width: 42rem;
 }
 
 .sh-header-panel-link {
