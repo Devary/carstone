@@ -20,12 +20,17 @@
 // search-crudstone's own .results-page, which has no top-clearance override token to hook into)
 // while still staying pinned once the page scrolls past it. Same backdrop-filter-over-translucent
 // -surface technique as sf-footer/.glass-card for the glass look itself.
+// a 3-column grid (logo | nav | toggle), not a plain flex row — the middle column is what gives
+// <sh-header> (@Header#position()) actual room to align its own content left/right/center within;
+// a flex row with margin-right:auto (the old single-<nav>-element approach) only ever supported
+// "flush left", the same gap this whole component exists to close generically.
 .site-header {
   position: sticky;
   top: 0;
   z-index: 900;
   flex-shrink: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 2rem;
   height: 4.5rem;
@@ -44,23 +49,10 @@
   text-decoration: none;
 }
 
+// <sh-header>'s own host element — sized by the grid column above; its internal .sh-header
+// (see header.component.scss) is what actually applies justify-content for left/right/center
 .site-header-nav {
-  display: flex;
-  gap: 1.5rem;
-  margin-right: auto;
-}
-
-.site-header-nav a {
-  color: var(--p-text-muted-color);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  transition: color 0.15s;
-}
-
-.site-header-nav a:hover,
-.site-header-nav a.active {
-  color: var(--p-primary-color);
+  min-width: 0;
 }
 
 .dark-toggle {

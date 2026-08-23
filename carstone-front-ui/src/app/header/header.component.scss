@@ -1,0 +1,133 @@
+// :host is <sh-header> itself — a plain custom element defaults to display:inline, which would
+// ignore the width app.component.scss's own grid column gives it. block + min-width:0 lets it
+// actually fill that column (min-width:0 so a long nav doesn't force the column, and the grid
+// itself, wider than intended — a grid/flex item's own default min-width is auto/content-based).
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.sh-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  height: 100%;
+}
+
+// @Header#position() — the host app's own .site-header-nav grid column (see app.component.scss)
+// gives this component the full flexible width to align within
+.sh-header--left {
+  justify-content: flex-start;
+}
+
+.sh-header--right {
+  justify-content: flex-end;
+}
+
+.sh-header--center {
+  justify-content: center;
+}
+
+.sh-header-link {
+  color: var(--p-text-muted-color);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.15s;
+}
+
+.sh-header-link:hover,
+.sh-header-link.active {
+  color: var(--p-primary-color);
+}
+
+.sh-header-item {
+  position: relative;
+}
+
+.sh-header-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--p-text-muted-color);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.15s;
+
+  i {
+    font-size: 0.7rem;
+    transition: transform 0.15s;
+  }
+}
+
+.sh-header-trigger:hover {
+  color: var(--p-primary-color);
+}
+
+.sh-header-item--open .sh-header-trigger {
+  color: var(--p-primary-color);
+
+  i {
+    transform: rotate(180deg);
+  }
+}
+
+.sh-header-panel {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  left: 0;
+  min-width: 12rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--p-content-background, #18181b) 92%, transparent);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid color-mix(in srgb, var(--p-primary-color, #3b82f6) 20%, transparent);
+  box-shadow: 0 12px 36px color-mix(in srgb, black 30%, transparent);
+}
+
+// a mega-menu panel is wider and lays its own entries out as a row of groups (each a column),
+// rather than the plain single-column list a simple-menu dropdown panel is
+.sh-header-panel--mega {
+  flex-direction: row;
+  min-width: 24rem;
+  gap: 2rem;
+}
+
+.sh-header-panel-link {
+  color: var(--p-text-muted-color);
+  text-decoration: none;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sh-header-panel-link:hover {
+  background: color-mix(in srgb, var(--p-primary-color, #3b82f6) 12%, transparent);
+  color: var(--p-primary-color);
+}
+
+.sh-header-panel-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 9rem;
+}
+
+.sh-header-panel-heading {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--p-text-color);
+  padding: 0.35rem 0.5rem 0;
+}

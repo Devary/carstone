@@ -1,13 +1,14 @@
 import {Component, computed, effect, signal} from '@angular/core';
-import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {RouterLink, RouterOutlet} from '@angular/router';
 import {Toast} from 'primeng/toast';
 import {themeVars} from 'searchcrudstone';
 import {FooterComponent} from './footer/footer.component';
+import {HeaderComponent} from './header/header.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Toast, FooterComponent],
+  imports: [RouterOutlet, RouterLink, Toast, FooterComponent, HeaderComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   // CarListing itself is theme="blue" (search bar/results already render blue from that context

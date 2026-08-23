@@ -1,0 +1,64 @@
+@if (header(); as h) {
+  <nav class="sh-header" [class]="'sh-header--' + h.position" data-cy="site-header-nav">
+    @if (h.variant === 'mega_menu') {
+      @for (section of h.sections; track $index) {
+        <div class="sh-header-item" [class.sh-header-item--open]="isOpen(section)">
+          <button type="button" class="sh-header-trigger" (click)="toggle(section, $event)" [attr.data-cy]="'header-trigger-' + section.title">
+            {{ section.title }}
+            @if (section.links.length) {
+              <i class="pi pi-angle-down"></i>
+            }
+          </button>
+          @if (section.links.length && isOpen(section)) {
+            <div class="sh-header-panel sh-header-panel--mega" [attr.data-cy]="'header-panel-' + section.title">
+              @for (link of section.links; track link.label) {
+                <ng-container *ngTemplateOutlet="panelEntry; context: {$implicit: link}" />
+              }
+            </div>
+          }
+        </div>
+      }
+    } @else {
+      @for (link of flatLinks(); track link.label) {
+        <ng-container *ngTemplateOutlet="topLevelLink; context: {$implicit: link}" />
+      }
+    }
+  </nav>
+}
+
+<!-- a top-level entry in the flat simple_menu row: a plain link, or a dropdown trigger opening a
+     single-column panel of its own children -->
+<ng-template #topLevelLink let-link>
+  @if (link.type === 'link') {
+    <a [routerLink]="link.url" routerLinkActive="active" class="sh-header-link" [attr.data-cy]="'header-link-' + link.label">{{ link.label }}</a>
+  } @else {
+    <div class="sh-header-item" [class.sh-header-item--open]="isOpen(link)">
+      <button type="button" class="sh-header-trigger" (click)="toggle(link, $event)" [attr.data-cy]="'header-trigger-' + link.label">
+        {{ link.label }}
+        <i class="pi pi-angle-down"></i>
+      </button>
+      @if (isOpen(link)) {
+        <div class="sh-header-panel" [attr.data-cy]="'header-panel-' + link.label">
+          @for (child of link.children; track child.label) {
+            <a [routerLink]="child.url" class="sh-header-panel-link">{{ child.label }}</a>
+          }
+        </div>
+      }
+    </div>
+  }
+</ng-template>
+
+<!-- one entry inside a panel (a mega-menu section's own links, or a simple-menu dropdown's own
+     children) — a plain link, or a further nested group with its own heading -->
+<ng-template #panelEntry let-link>
+  @if (link.type === 'link') {
+    <a [routerLink]="link.url" class="sh-header-panel-link">{{ link.label }}</a>
+  } @else {
+    <div class="sh-header-panel-group">
+      <span class="sh-header-panel-heading">{{ link.label }}</span>
+      @for (child of link.children; track child.label) {
+        <a [routerLink]="child.url" class="sh-header-panel-link">{{ child.label }}</a>
+      }
+    </div>
+  }
+</ng-template>
